@@ -1,0 +1,6 @@
+@X4U.API_HostAddress = http://localhost:5212
+
+GET {{X4U.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

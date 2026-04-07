@@ -1,0 +1,8 @@
+.git
+.env
+/ingestor/main
+bin/
+obj/
+containers/
+ingestor/migrations
+benchmarks/

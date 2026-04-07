@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xploit4us - Vulnerability Database</title>
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <img src="images/logo.png" alt="xploit4us">
+        </div>
+        <div class="header-right">
+            <a href="https://github.com/pollotherunner/xploit4us" target="_blank" class="github-link" title="GitHub">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent">
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('vulnerabilities')">Vulnerabilities</button>
+            <button class="tab" onclick="showTab('exploits')">Exploits</button>
+        </div>
+
+        <!-- Vulnerabilities Panel -->
+        <div id="vulnerabilities" class="panel active">
+            <div class="panel-header">
+                <div class="panel-title">Vulnerability Database</div>
+            </div>
+
+            <div class="main-search">
+                <input type="text" id="v_mainSearch" placeholder="Search vulnerabilities by description." oninput="debouncedSearchVulnerabilities()">
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>CVE ID</label>
+                    <input type="text" id="v_cveId" placeholder="CVE-2024-1234" oninput="formatCveInput(this)">
+                </div>
+                <div class="filter-group">
+                    <label>CVE Year</label>
+                    <input type="text" id="v_cveYear" placeholder="2024" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+                <div class="filter-group">
+                    <label>Source</label>
+                    <select id="v_sourceName">
+                        <option value="">All</option>
+                        <option value="NIST">NIST</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Severity</label>
+                    <select id="v_baseSeverity">
+                        <option value="">All</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="LOW">LOW</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>CVSS Version</label>
+                    <select id="v_cvssVersion">
+                        <option value="">All</option>
+                        <option value="2.0">2.0</option>
+                        <option value="3.0">3.0</option>
+                        <option value="3.1">3.1</option>
+                        <option value="4.0">4.0</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min Score</label>
+                    <input type="number" id="v_minBaseScore" min="0" max="10" step="0.1">
+                </div>
+                <div class="filter-group">
+                    <label>Max Score</label>
+                    <input type="number" id="v_maxBaseScore" min="0" max="10" step="0.1">
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select id="v_vulnStatus">
+                        <option value="">All</option>
+                        <option value="Analyzed">Analyzed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Modified">Modified</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Has Exploit</label>
+                    <select id="v_hasExploit">
+                        <option value="">All</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort Section -->
+            <div class="sort-section">
+                <div class="sort-header">
+                    <label class="sort-label">Order By</label>
+                    <button class="btn-add-sort" onclick="addSortSlot('vuln')">+ Add criterion</button>
+                </div>
+                <div id="v_sortContainer" class="sort-slots"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn" onclick="searchVulnerabilities()">Search</button>
+                <button class="btn btn-secondary" onclick="clearVulnerabilityFilters()">Clear</button>
+            </div>
+
+            <div class="page-size-group">
+                <label>Page Size</label>
+                <select id="v_pageSize">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
+            </div>
+
+            <div id="vulnerabilityResults" class="results"></div>
+        </div>
+
+        <!-- Exploits Panel -->
+        <div id="exploits" class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Exploit Database</div>
+            </div>
+
+            <div class="main-search">
+                <input type="text" id="e_mainSearch" placeholder="Search exploits by title." oninput="debouncedSearchExploits()">
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Source</label>
+                    <select id="e_sourceName">
+                        <option value="">All</option>
+                        <option value="GitHub">GitHub</option>
+                        <option value="ExploitDB">ExploitDB</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Author</label>
+                    <input type="text" id="e_author" placeholder="author name">
+                </div>
+                <div class="filter-group">
+                    <label>Type</label>
+                    <input type="text" id="e_type" placeholder="remote">
+                </div>
+                <div class="filter-group">
+                    <label>Platform</label>
+                    <input type="text" id="e_platform" placeholder="windows">
+                </div>
+                <div class="filter-group">
+                    <label>Verified</label>
+                    <select id="e_isVerified">
+                        <option value="">All</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Min GitHub Stars</label>
+                    <input type="number" id="e_minGithubStars" min="0" placeholder="0">
+                </div>
+                <div class="filter-group">
+                    <label>CVE ID</label>
+                    <input type="text" id="e_cveId" placeholder="CVE-2024-1234" oninput="formatCveInput(this)">
+                </div>
+            </div>
+
+            <!-- Sort Section -->
+            <div class="sort-section">
+                <div class="sort-header">
+                    <label class="sort-label">Order By</label>
+                    <button class="btn-add-sort" onclick="addSortSlot('exploit')">+ Add criterion</button>
+                </div>
+                <div id="e_sortContainer" class="sort-slots"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn" onclick="searchExploits()">Search</button>
+                <button class="btn btn-secondary" onclick="clearExploitFilters()">Clear</button>
+            </div>
+
+            <div class="page-size-group">
+                <label>Page Size</label>
+                <select id="e_pageSize">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
+            </div>
+
+            <div id="exploitResults" class="results"></div>
+        </div>
+    </div>
+
+    <!-- Vulnerability Detail Page -->
+    <div id="vulnDetailPage" class="detail-page">
+        <div class="breadcrumb">
+            <a href="#" onclick="navigateHome(); return false;">Home</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="#" onclick="navigateToTab('vulnerabilities'); return false;">Vulnerabilities</a>
+            <span class="breadcrumb-separator">/</span>
+            <span id="vulnBreadcrumbId">CVE-XXXX-XXXXX</span>
+        </div>
+
+        <div class="detail-header">
+            <h1 class="detail-title" id="vulnDetailId">CVE-XXXX-XXXXX</h1>
+            <div class="detail-grid" id="vulnDetailGrid"></div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Description</h3>
+            <div class="description-text" id="vulnDetailDescription"></div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Related Exploits (<span id="vulnExploitsCount">0</span>)</h3>
+            <div id="vulnExploitsList"></div>
+        </div>
+    </div>
+
+    <!-- Exploit Detail Page -->
+    <div id="exploitDetailPage" class="detail-page">
+        <div class="breadcrumb">
+            <a href="#" onclick="navigateHome(); return false;">Home</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="#" onclick="navigateToTab('exploits'); return false;">Exploits</a>
+            <span class="breadcrumb-separator">/</span>
+            <span id="exploitBreadcrumbId">EDB-XXXXX</span>
+        </div>
+
+        <div class="detail-header">
+            <h1 class="detail-title" id="exploitDetailId">EDB-XXXXX</h1>
+            <div class="detail-grid" id="exploitDetailGrid"></div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Title</h3>
+            <div class="description-text" id="exploitDetailTitle"></div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Source Code</h3>
+            <div class="code-actions" style="margin-bottom: 10px;">
+                <button class="copy-btn" onclick="copyExploitCode()" title="Copy code">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="code-block" id="exploitDetailCode"></div>
+        </div>
+
+        <div class="detail-section">
+            <h3>Related Vulnerabilities (<span id="exploitVulnsCount">0</span>)</h3>
+            <div id="exploitVulnsList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Script -->
+<script src="js/app.js"></script>
+</body>
+</html>

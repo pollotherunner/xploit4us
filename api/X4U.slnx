@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="X4U.API/X4U.API.csproj" />
+  <Project Path="X4U.Application/X4U.Application.csproj" />
+  <Project Path="X4U.Domain/X4U.Domain.csproj" />
+  <Project Path="X4U.Infrastructure/X4U.Infrastructure.csproj" />
+</Solution>
